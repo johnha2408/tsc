@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quy trình thẩm định tài sản công</title>
+<meta name="description" content="Quy trình bán, thanh lý tài sản công bằng hình thức đấu giá tại Huế: 11 bước, ghi rõ bộ phận, cơ quan chủ trì, ký và phối hợp ở từng bước.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../assets/theme.js"></script>
+</head>
+<body>
+<nav class="topbar" aria-label="Điều hướng">
+  <a class="brand" href="../">Sổ tay tài sản công <span>· Trung tâm DVSNC</span></a>
+  <div class="tools">
+    <button class="btn" id="print-btn" type="button">In trang</button>
+    <button class="btn" id="theme-toggle" type="button">Giao diện tối</button>
+  </div>
+</nav>
+
+<main class="wrap">
+  <header class="page-head">
+    <div class="crumbs"><a href="../">Trang chủ</a><span>/</span><span>Quy trình thẩm định tài sản công</span></div>
+    <h1>Quy trình thẩm định tài sản công</h1>
+    <p>Bán, thanh lý tài sản công bằng hình thức đấu giá, nhìn từ góc độ Phòng Tài sản công của Trung tâm Dịch vụ sự nghiệp công cấp xã tại Huế. Mỗi bước ghi rõ ai chủ trì, ai ký hoặc quyết định, ai phối hợp và giấy tờ đầu ra.</p>
+    <div class="meta">
+      <span><b>Căn cứ chính:</b> NĐ 186/2025/NĐ-CP (sửa bởi NĐ 286/2025) · QĐ 114/2025/QĐ-CTUBND Huế · TT 26/2024/TT-BTNMT</span>
+      <span><b>Cập nhật:</b> 10/2026</span>
+    </div>
+  </header>
+
+  <noscript><p class="note">Trang cần bật JavaScript để hiển thị sơ đồ và các bước.</p></noscript>
+
+  <section class="panel" aria-labelledby="who-h">
+    <h2 id="who-h">Các bên tham gia</h2>
+    <p class="lead">Chọn một bên để xem bên đó làm gì ở từng bước. Các bước bên đó không tham gia sẽ mờ đi.</p>
+    <div class="groups" id="groups"></div>
+    <div class="filterbar"><span id="filter-state" aria-live="polite">Đang xem: tất cả các bên</span><button class="btn" id="reset" type="button">Xem tất cả</button></div>
+    <div class="marks">
+      <span><i class="m m-c"></i>Chủ trì thực hiện</span>
+      <span><i class="m m-s"></i>Ký / quyết định</span>
+      <span><i class="m m-p"></i>Phối hợp</span>
+      <span>Viền nét đứt: bước có điều kiện</span>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="map-h">
+    <h2 id="map-h">Sơ đồ làn</h2>
+    <p class="lead">Hàng là các bước theo thứ tự, cột là các bên. Bấm vào một hàng để chuyển xuống thẻ chi tiết của bước đó.</p>
+    <div class="scroll"><table class="matrix" id="matrix"></table></div>
+    <p class="hint">* Bước 2 chỉ áp dụng khi tài sản là nhà, đất. Rê chuột vào ô để xem việc cụ thể.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="detail-h">
+    <h2 id="detail-h">Chi tiết từng bước</h2>
+    <div id="phases" class="stack"></div>
+  </section>
+
+  <footer class="site-foot">
+    <span class="eyebrow">Lưu ý</span>
+    <ul>
+      <li>Thẩm quyền theo QĐ 114/2025/QĐ-CTUBND Huế: Chủ tịch UBND phường/xã quyết định bán, thanh lý tài sản thuộc phạm vi quản lý; riêng bán ô tô, thanh lý nhà và ô tô do Chủ tịch UBND thành phố quyết định.</li>
+      <li>Tài sản giá trị nhỏ có thể bán niêm yết giá hoặc bán chỉ định thay vì đấu giá. Kiểm tra ngưỡng tại Điều 26, 27, 31 NĐ 186 (đã sửa đổi) trước khi đề xuất.</li>
+      <li>Nếu Trung tâm trực thuộc một Sở thay vì UBND phường/xã, cấp quyết định ở bước 4 là Giám đốc Sở đó.</li>
+      <li>Mẫu biểu, phí và thời hạn cụ thể nên đối chiếu với hướng dẫn hiện hành của Sở Tài chính Huế và Chi nhánh Văn phòng Đăng ký đất đai khu vực.</li>
+      <li>Tài liệu tham khảo nội bộ, không thay thế văn bản quy phạm pháp luật.</li>
+    </ul>
+  </footer>
+</main>
+
+<script src="../assets/quy-trinh-tham-dinh.js"></script>
+</body>
+</html>
