@@ -8,12 +8,195 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="../assets/site.css">
-<script src="../assets/theme.js"></script>
+<style>
+/* Sổ tay tài sản công — giao diện dùng chung
+   Bố cục: tài liệu hành chính, cột đọc 1120px, viền đậm dưới tiêu đề, thẻ theo giai đoạn */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#16202d; --muted:#596476; --line:#d8dde5; --soft:#eef1f5;
+  --accent:#1f4e8c; --seal:#b3261e;
+  --g-tt:#1f4e8c; --g-cq:#b3261e; --g-dd:#2c7a4c; --g-dv:#9a6110; --g-ng:#646d7b;
+  --f-body:"Be Vietnam Pro", "Segoe UI", Roboto, Arial, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f141b; --surface:#171d26; --ink:#e6eaf0; --muted:#9aa4b3; --line:#2b3341; --soft:#1d2430;
+  --accent:#86b0ec; --seal:#f07468;
+  --g-tt:#86b0ec; --g-cq:#f07468; --g-dd:#6fc795; --g-dv:#e3aa52; --g-ng:#a6aebb; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#0f141b; --surface:#171d26; --ink:#e6eaf0; --muted:#9aa4b3; --line:#2b3341; --soft:#1d2430;
+  --accent:#86b0ec; --seal:#f07468;
+  --g-tt:#86b0ec; --g-cq:#f07468; --g-dd:#6fc795; --g-dv:#e3aa52; --g-ng:#a6aebb; color-scheme:dark; }
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 56px}
+a{color:var(--accent)}
+h1,h2,h3,h4{text-wrap:balance;margin:0}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+.stack{display:flex;flex-direction:column;gap:32px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Thanh trên cùng */
+.topbar{max-width:1120px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding-block:14px;border-bottom:1px solid var(--line);margin-bottom:28px}
+.brand{font-weight:800;color:var(--ink);text-decoration:none;font-size:15px;letter-spacing:-.005em}
+.brand span{color:var(--muted);font-weight:500}
+.tools{display:flex;gap:8px}
+.btn{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:5px 11px;cursor:pointer;text-decoration:none}
+.btn:hover{border-color:var(--accent)}
+.crumbs{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px}
+.crumbs a{color:var(--muted)}
+
+/* Tiêu đề trang */
+.page-head{display:flex;flex-direction:column;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:20px}
+.page-head h1{font-size:clamp(26px,4.2vw,40px);font-weight:800;letter-spacing:-.01em;line-height:1.15}
+.page-head p{margin:0;color:var(--muted);max-width:70ch}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+
+/* Trang chủ */
+.toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.toc a{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.toc a:hover{border-color:var(--accent)}
+.toc h3{font-size:19px;font-weight:700}
+.toc p{margin:0;color:var(--muted);font-size:14px}
+.toc .go{font-size:13px;font-weight:600;color:var(--accent)}
+
+/* Bảng chú giải và bộ lọc */
+.panel{display:flex;flex-direction:column;gap:14px}
+.panel h2{font-size:20px;font-weight:700}
+.panel .lead{margin:0;color:var(--muted);max-width:75ch}
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.group{display:flex;flex-direction:column;gap:6px;min-width:0}
+.group-name{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.group-name::before{content:"";width:10px;height:10px;border-radius:2px;background:var(--gc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;font-weight:600;border:1.5px solid color-mix(in srgb,var(--gc) 45%,transparent);
+  background:color-mix(in srgb,var(--gc) 9%,var(--surface));color:var(--ink);border-radius:999px;padding:4px 11px;cursor:pointer;text-align:left}
+.chip:hover{border-color:var(--gc)}
+.chip[aria-pressed="true"]{background:var(--gc);color:var(--surface);border-color:var(--gc)}
+.filterbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.marks{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);align-items:center}
+.marks span{display:inline-flex;align-items:center;gap:7px}
+
+/* Ký hiệu vai trò */
+.m{display:inline-block;flex:none}
+.m-c{width:13px;height:13px;border-radius:50%;background:var(--mc,var(--ink))}
+.m-p{width:13px;height:13px;border-radius:50%;border:2px solid var(--mc,var(--ink))}
+.m-s{width:15px;height:15px;border:2px solid var(--seal);transform:rotate(45deg);border-radius:2px;position:relative}
+.m-s::after{content:"";position:absolute;inset:3px;background:var(--seal);border-radius:1px}
+
+/* Sơ đồ làn */
+.scroll{position:relative;overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.matrix{border-collapse:collapse;width:100%;min-width:980px;font-size:13px}
+.matrix th,.matrix td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:center;vertical-align:middle}
+.matrix thead th{font-weight:600;font-size:12px;line-height:1.3;vertical-align:bottom;background:var(--soft)}
+.matrix thead th .lane-top{display:block;height:4px;background:var(--gc);border-radius:2px;margin-bottom:6px}
+.matrix thead th small{display:block;color:var(--muted);font-weight:400;font-size:11px}
+.matrix tbody th{text-align:left;font-weight:500;padding-left:12px;min-width:220px;position:sticky;left:0;background:var(--surface);z-index:1}
+.matrix thead th:first-child{text-align:left;padding-left:12px;position:sticky;left:0;z-index:2}
+.matrix tbody th .n{font-family:var(--f-mono);color:var(--muted);margin-right:6px}
+.matrix tr.phase-row td{background:var(--soft);text-align:left;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 12px}
+.matrix tr.cond th{font-style:italic}
+.matrix td.on{background:color-mix(in srgb,var(--gc) 7%,transparent)}
+.matrix col.hl{background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.matrix tbody tr[data-step]{cursor:pointer}
+.matrix tbody tr[data-step]:hover th{color:var(--accent)}
+.hint{margin:0;font-size:13px;color:var(--muted)}
+.dim{opacity:.25}
+
+/* Thẻ chi tiết */
+.phase{display:flex;flex-direction:column;gap:14px}
+.phase-h{display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.phase-h .L{font-family:var(--f-mono);font-weight:500;color:var(--accent);font-size:15px}
+.phase-h h3{font-size:18px;font-weight:700}
+.cards{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;transition:opacity .2s, box-shadow .2s;scroll-margin-top:16px}
+.card.cond{border-style:dashed;border-width:1.5px}
+.card.flash{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 35%,transparent)}
+.card-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px}
+.card-h .num{font-family:var(--f-mono);font-weight:500;font-size:13px;color:var(--surface);background:var(--ink);border-radius:5px;padding:1px 7px}
+.card-h h4{font-size:17px;font-weight:700;flex:1 1 260px;min-width:0}
+.tag{font-size:12px;font-weight:600;border-radius:5px;padding:2px 8px;white-space:nowrap}
+.tag-cond{color:var(--g-dd);background:color-mix(in srgb,var(--g-dd) 12%,transparent)}
+.tag-time{color:var(--ink);background:var(--soft);border:1px solid var(--line)}
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:210px 120px 1fr;gap:4px 12px;padding:9px 0;border-top:1px solid var(--line);align-items:start}
+.row:first-child{border-top:0;padding-top:0}
+.who{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;min-width:0}
+.who::before{content:"";width:4px;align-self:stretch;min-height:18px;border-radius:2px;background:var(--gc);flex:none}
+.role{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted)}
+.role.s{color:var(--seal)}
+.task{min-width:0;max-width:68ch}
+.row.me{background:color-mix(in srgb,var(--accent) 8%,transparent);border-radius:6px;padding-inline:8px;margin-inline:-8px}
+.out{font-size:13px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:10px}
+.out b{color:var(--ink);font-weight:600}
+.branch{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.br{border-left:3px solid var(--bc);background:color-mix(in srgb,var(--bc) 7%,transparent);border-radius:0 8px 8px 0;padding:10px 12px;font-size:14px;min-width:0}
+.br b{display:block;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--bc);margin-bottom:2px}
+.note{font-size:14px;background:var(--soft);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.note p{margin:0}
+.note b{color:var(--ink)}
+
+.site-foot{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:8px}
+.site-foot ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:2px}
+
+@media (max-width:720px){
+  .row{grid-template-columns:1fr;gap:4px}
+  .card{padding:16px}
+}
+@media (prefers-reduced-motion:reduce){ .card{transition:none} }
+
+/* Bản in: bỏ phần tương tác, giữ thẻ chi tiết */
+@media print{
+  :root{--bg:#fff;--surface:#fff;--ink:#000;--muted:#333;--line:#bbb;--soft:#f2f2f2}
+  body{padding:0;font-size:12px}
+  .topbar .tools,.filterbar{display:none}
+  .dim{opacity:1}
+  .scroll{overflow:visible;border:0}
+  .matrix{min-width:0;font-size:10px}
+  .card{break-inside:avoid;box-shadow:none}
+  a{color:inherit;text-decoration:none}
+}
+
+</style>
+<script>
+// Chuyển giao diện sáng / tối, nhớ lựa chọn trên trình duyệt này
+(function () {
+  var root = document.documentElement;
+  try { var saved = localStorage.getItem('theme'); if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved); } catch (e) {}
+
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function label(btn) { btn.textContent = current() === 'dark' ? 'Giao diện sáng' : 'Giao diện tối'; }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('theme-toggle');
+    if (btn) {
+      label(btn);
+      btn.addEventListener('click', function () {
+        var next = current() === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+        label(btn);
+      });
+    }
+    var pr = document.getElementById('print-btn');
+    if (pr) pr.addEventListener('click', function () { window.print(); });
+  });
+})();
+
+</script>
 </head>
 <body>
 <nav class="topbar" aria-label="Điều hướng">
-  <a class="brand" href="../">Sổ tay tài sản công <span>· Trung tâm DVSNC</span></a>
+  <a class="brand" href="./">Sổ tay tài sản công <span>· Trung tâm DVSNC</span></a>
   <div class="tools">
     <button class="btn" id="print-btn" type="button">In trang</button>
     <button class="btn" id="theme-toggle" type="button">Giao diện tối</button>
@@ -22,7 +205,6 @@
 
 <main class="wrap">
   <header class="page-head">
-    <div class="crumbs"><a href="../">Trang chủ</a><span>/</span><span>Quy trình thẩm định tài sản công</span></div>
     <h1>Quy trình thẩm định tài sản công</h1>
     <p>Bán, thanh lý tài sản công bằng hình thức đấu giá, nhìn từ góc độ Phòng Tài sản công của Trung tâm Dịch vụ sự nghiệp công cấp xã tại Huế. Mỗi bước ghi rõ ai chủ trì, ai ký hoặc quyết định, ai phối hợp và giấy tờ đầu ra.</p>
     <div class="meta">
@@ -70,6 +252,207 @@
   </footer>
 </main>
 
-<script src="../assets/quy-trinh-tham-dinh.js"></script>
+<script>
+// Dữ liệu và hiển thị: Quy trình thẩm định tài sản công
+// Sửa nội dung các bước trong mảng PHASES bên dưới; sơ đồ làn và thẻ chi tiết tự cập nhật.
+(function () {
+  var GROUPS = [
+    { id: 'tt', name: 'Nội bộ Trung tâm', color: '--g-tt' },
+    { id: 'cq', name: 'Chính quyền', color: '--g-cq' },
+    { id: 'dd', name: 'Đất đai & đo đạc', color: '--g-dd' },
+    { id: 'dv', name: 'Dịch vụ thuê ngoài', color: '--g-dv' },
+    { id: 'ng', name: 'Bên ngoài khác', color: '--g-ng' }
+  ];
+  var LANES = [
+    { id: 'P', name: 'Phòng Tài sản công', sub: 'Trung tâm (đầu mối)', g: 'tt' },
+    { id: 'L', name: 'Giám đốc / Hội đồng', sub: 'Trung tâm', g: 'tt' },
+    { id: 'K', name: 'Kế toán', sub: 'Trung tâm', g: 'tt' },
+    { id: 'X', name: 'UBND phường/xã', sub: 'Phòng Kinh tế tham mưu', g: 'cq' },
+    { id: 'T', name: 'Sở Tài chính / UBND TP', sub: 'chỉ nhà, ô tô', g: 'cq' },
+    { id: 'D', name: 'Đơn vị đo đạc', sub: 'có giấy phép', g: 'dd' },
+    { id: 'V', name: 'Chi nhánh VPĐKĐĐ', sub: 'khu vực, Sở NN&MT', g: 'dd' },
+    { id: 'G', name: 'Thẩm định giá', sub: 'DN hoặc Hội đồng', g: 'dv' },
+    { id: 'A', name: 'Tổ chức đấu giá', sub: '+ Cổng đấu giá QG', g: 'dv' },
+    { id: 'N', name: 'Bên ngoài khác', sub: 'liền kề, người mua, KBNN, thuế', g: 'ng' }
+  ];
+  var ROLE = { c: 'Chủ trì', s: 'Ký / quyết định', p: 'Phối hợp' };
+
+  var PHASES = [
+    { L: 'A', name: 'Chuẩn bị tại đơn vị', steps: [
+      { n: 1, t: 'Rà soát, kiểm kê, đánh giá hiện trạng tài sản', short: 'Rà soát, kiểm kê', who: [
+        ['P', 'c', 'Rà soát sổ tài sản, đề xuất danh mục cần xử lý và hình thức (bán hay thanh lý).'],
+        ['L', 's', 'Hội đồng kiểm kê ký biên bản kiểm kê, biên bản đánh giá hiện trạng.'],
+        ['K', 'p', 'Đối chiếu nguyên giá, giá trị còn lại, thời gian khấu hao.']],
+        out: 'Biên bản kiểm kê · Biên bản đánh giá hiện trạng · Danh mục tài sản đề nghị xử lý' },
+      { n: 2, t: 'Đo đạc, lập bản vẽ, ký giáp ranh', short: 'Đo đạc, bản vẽ, giáp ranh', cond: 'Chỉ khi là nhà, đất', who: [
+        ['P', 'c', 'Chọn đơn vị đo đạc theo quy định mua sắm; chuẩn bị giấy tờ đất; đi hiện trường chỉ ranh; liên hệ các hộ liền kề; đối chiếu kết quả với hồ sơ.'],
+        ['D', 'c', 'Đo đạc; lập bản mô tả ranh giới, mốc giới, mảnh trích đo (hoặc phiếu đo đạc chỉnh lý) và bản vẽ hiện trạng; ký xác nhận phần kỹ thuật.'],
+        ['L', 's', 'Ký, đóng dấu với tư cách người sử dụng đất trên bản mô tả ranh giới và mảnh trích đo.'],
+        ['N', 'p', 'Chủ sử dụng đất liền kề ký xác nhận ranh giới chung. Người dẫn đạc (tổ trưởng tổ dân phố hoặc người nắm rõ hiện trạng) ký xác nhận.'],
+        ['X', 's', 'Kiểm tra việc xác định ranh giới, ký xác nhận đo vẽ đúng hiện trạng. Niêm yết bản mô tả khi hộ liền kề vắng mặt hoặc không ký.'],
+        ['V', 's', 'Kiểm tra, ký duyệt mảnh trích đo hoặc phiếu chỉnh lý; xác nhận sơ đồ tài sản gắn liền với đất.']],
+        branch: [
+          { c: '--g-dd', h: 'Hộ liền kề vắng mặt hoặc không ký', b: 'Đơn vị đo đạc chuyển bản mô tả cho UBND phường/xã niêm yết tại trụ sở và nhà văn hóa tổ dân phố. Sau 15 ngày niêm yết (hoặc 10 ngày kể từ khi nhận bản mô tả) mà vẫn không ký, không có tranh chấp: đơn vị đo đạc cùng UBND lập biên bản ghi rõ lý do; ranh giới xác định theo bản mô tả.' },
+          { c: '--seal', h: 'Có tranh chấp ranh giới', b: 'Bản mô tả thể hiện cả ranh giới theo hiện trạng và theo ý kiến các bên; đề nghị UBND phường/xã hòa giải. Không đưa phần đang tranh chấp vào tài sản đấu giá.' }],
+        notes: [
+          '<b>Công an không phải bên ký</b> bản mô tả ranh giới. Công an phường chỉ được mời hỗ trợ giữ trật tự khi có tranh chấp tại hiện trường. Nếu mẫu của địa phương có ô công an, hỏi lại Chi nhánh VPĐKĐĐ xem có bắt buộc không.',
+          '<b>Nhà, đất</b> phải nằm trong phương án sắp xếp lại, xử lý nhà đất đã được phê duyệt.'],
+        out: 'Bản mô tả ranh giới, mốc giới · Mảnh trích đo / phiếu đo đạc chỉnh lý · Bản vẽ hiện trạng nhà, đất' },
+      { n: 3, t: 'Lập hồ sơ đề nghị xử lý tài sản', short: 'Lập hồ sơ đề nghị', who: [
+        ['P', 'c', 'Soạn văn bản đề nghị theo Mẫu 01/TSC-XLTS, kèm danh mục tài sản và các biên bản.'],
+        ['K', 'p', 'Cung cấp số liệu kế toán cho danh mục.'],
+        ['L', 's', 'Giám đốc ký văn bản đề nghị, gửi cấp có thẩm quyền.']],
+        out: 'Văn bản đề nghị (Mẫu 01/TSC-XLTS) · Danh mục tài sản · Hồ sơ kèm theo' }
+    ] },
+    { L: 'B', name: 'Xin quyết định của cấp có thẩm quyền', steps: [
+      { n: 4, t: 'Thẩm định và quyết định bán / thanh lý theo hình thức đấu giá', short: 'Quyết định bán / thanh lý', time: '20 ngày (bán) · 30 ngày (thanh lý)', who: [
+        ['X', 's', 'Phòng Kinh tế (ở phường: Phòng Kinh tế, Hạ tầng và Đô thị) thẩm định; Chủ tịch UBND phường/xã ký quyết định.'],
+        ['T', 's', 'Chỉ với nhà, ô tô: Sở Tài chính thẩm định, Chủ tịch UBND thành phố quyết định.'],
+        ['P', 'p', 'Theo dõi hồ sơ; giải trình, bổ sung khi được yêu cầu.']],
+        branch: [
+          { c: '--g-cq', h: 'Tài sản thông thường', b: 'Máy móc, thiết bị, vật tư thu hồi… Chủ tịch UBND phường/xã quyết định.' },
+          { c: '--g-cq', h: 'Nhà, ô tô', b: 'UBND phường/xã chuyển hồ sơ, Sở Tài chính thẩm định, Chủ tịch UBND thành phố quyết định.' }],
+        out: 'Quyết định bán / thanh lý, giao Trung tâm tổ chức đấu giá' }
+    ] },
+    { L: 'C', name: 'Chuẩn bị đấu giá', steps: [
+      { n: 5, t: 'Xác định giá khởi điểm', short: 'Giá khởi điểm', who: [
+        ['P', 'c', 'Lựa chọn doanh nghiệp thẩm định giá theo quy định mua sắm, hoặc đề xuất thành lập Hội đồng thẩm định giá.'],
+        ['G', 'c', 'Thẩm định giá, phát hành chứng thư (hoặc biên bản của Hội đồng).'],
+        ['L', 's', 'Giám đốc quyết định giá khởi điểm (chưa gồm VAT).']],
+        out: 'Chứng thư thẩm định giá · Quyết định phê duyệt giá khởi điểm' },
+      { n: 6, t: 'Lựa chọn tổ chức hành nghề đấu giá', short: 'Chọn tổ chức đấu giá', who: [
+        ['P', 'c', 'Lập thông báo và bảng tiêu chí chấm điểm, đăng trên Cổng thông tin điện tử quốc gia về đấu giá tài sản; tiếp nhận hồ sơ, chấm điểm.'],
+        ['A', 'p', 'Các tổ chức đấu giá nộp hồ sơ đăng ký.'],
+        ['L', 's', 'Phê duyệt kết quả lựa chọn, công bố kết quả trên Cổng; ký hợp đồng dịch vụ đấu giá.']],
+        out: 'Thông báo lựa chọn · Thông báo kết quả · Hợp đồng dịch vụ đấu giá' },
+      { n: 7, t: 'Chuẩn bị phiên đấu giá', short: 'Chuẩn bị phiên', who: [
+        ['A', 'c', 'Ban hành quy chế cuộc đấu giá; niêm yết, thông báo công khai; bán hồ sơ, thu tiền đặt trước.'],
+        ['P', 'p', 'Rà soát quy chế (thời hạn nộp tiền, điều khoản hủy hợp đồng); dẫn khách xem tài sản; giữ tài sản nguyên trạng.']],
+        out: 'Quy chế cuộc đấu giá · Thông báo, niêm yết' }
+    ] },
+    { L: 'D', name: 'Đấu giá', steps: [
+      { n: 8, t: 'Tổ chức phiên đấu giá', short: 'Phiên đấu giá', who: [
+        ['A', 'c', 'Điều hành phiên đấu giá, lập biên bản.'],
+        ['L', 's', 'Cử đại diện người có tài sản tham dự, ký biên bản đấu giá.'],
+        ['P', 'p', 'Cùng tham dự, nhận hồ sơ kết quả.'],
+        ['N', 'p', 'Người tham gia đấu giá trả giá.']],
+        branch: [
+          { c: '--seal', h: 'Nếu đấu giá không thành', b: 'Xử lý theo Điều 25 NĐ 186: tổ chức đấu giá lại (có thể điều chỉnh giá khởi điểm, quay lại bước 5) hoặc chuyển phương thức khác theo quy định.' }],
+        out: 'Biên bản đấu giá' }
+    ] },
+    { L: 'E', name: 'Hoàn tất', steps: [
+      { n: 9, t: 'Ký hợp đồng mua bán, thu tiền, xuất hóa đơn', short: 'Hợp đồng, thu tiền', who: [
+        ['L', 's', 'Ký hợp đồng mua bán với người trúng đấu giá.'],
+        ['K', 'c', 'Theo dõi nộp tiền, xuất hóa đơn. Quá hạn chưa nộp đủ thì hủy hợp đồng theo quy chế.'],
+        ['N', 'p', 'Người mua nộp tiền; Kho bạc Nhà nước (tài khoản nhận tiền); cơ quan thuế (hóa đơn, nghĩa vụ thuế).']],
+        out: 'Hợp đồng mua bán · Chứng từ thu · Hóa đơn' },
+      { n: 10, t: 'Bàn giao tài sản cho người mua', short: 'Bàn giao', who: [
+        ['P', 'c', 'Lập biên bản bàn giao, chỉ bàn giao khi người mua đã nộp đủ tiền.'],
+        ['N', 'p', 'Người mua nhận tài sản. Với xe: làm thủ tục sang tên tại cơ quan đăng ký xe (công an).']],
+        out: 'Biên bản bàn giao' },
+      { n: 11, t: 'Hạch toán, báo cáo, lưu hồ sơ', short: 'Hạch toán, báo cáo', time: 'Trong 30 ngày sau khi bán xong', who: [
+        ['K', 'c', 'Hạch toán giảm tài sản; quyết toán chi phí bán; xử lý số tiền thu theo quy định.'],
+        ['P', 'c', 'Báo cáo kê khai biến động; cập nhật Cơ sở dữ liệu quốc gia về tài sản công; lưu trọn bộ hồ sơ.'],
+        ['X', 'p', 'Nhận báo cáo kết quả thực hiện quyết định.']],
+        out: 'Báo cáo kê khai biến động · Hồ sơ lưu trữ' }
+    ] }
+  ];
+
+  var laneById = {}; LANES.forEach(function (l) { laneById[l.id] = l; });
+  function gcolor(g) { for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i].id === g) return 'var(' + GROUPS[i].color + ')'; }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function attr(s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+  function mark(r, g) {
+    return r === 's' ? '<i class="m m-s" aria-hidden="true"></i>'
+      : '<i class="m m-' + r + '" style="--mc:' + gcolor(g) + '" aria-hidden="true"></i>';
+  }
+
+  /* Chú giải: các bên tham gia */
+  var groupsEl = document.getElementById('groups');
+  GROUPS.forEach(function (g) {
+    var lanes = LANES.filter(function (l) { return l.g === g.id; });
+    var div = document.createElement('div');
+    div.className = 'group'; div.style.setProperty('--gc', 'var(' + g.color + ')');
+    div.innerHTML = '<span class="group-name">' + g.name + '</span><div class="chips">' + lanes.map(function (l) {
+      return '<button type="button" class="chip" id="chip-' + l.id + '" data-lane="' + l.id + '" aria-pressed="false">' + l.name + '</button>';
+    }).join('') + '</div>';
+    groupsEl.appendChild(div);
+  });
+
+  /* Sơ đồ làn */
+  var h = '<caption class="sr-only">Sơ đồ làn: các bước và vai trò của từng bên</caption><colgroup><col>' +
+    LANES.map(function (l) { return '<col data-col="' + l.id + '">'; }).join('') + '</colgroup>';
+  h += '<thead><tr><th scope="col">Bước</th>' + LANES.map(function (l) {
+    return '<th scope="col" style="--gc:' + gcolor(l.g) + '"><span class="lane-top"></span>' + l.name + '<small>' + l.sub + '</small></th>';
+  }).join('') + '</tr></thead><tbody>';
+  PHASES.forEach(function (ph) {
+    h += '<tr class="phase-row"><td colspan="' + (LANES.length + 1) + '">' + ph.L + ' · ' + ph.name + '</td></tr>';
+    ph.steps.forEach(function (s) {
+      var map = {}; s.who.forEach(function (w) { map[w[0]] = w; });
+      h += '<tr data-step="' + s.n + '" class="' + (s.cond ? 'cond' : '') + '"><th scope="row"><span class="n">' + pad(s.n) + '</span>' + s.short + (s.cond ? ' *' : '') + '</th>';
+      LANES.forEach(function (l) {
+        var w = map[l.id];
+        h += w ? '<td class="on" data-lane="' + l.id + '" style="--gc:' + gcolor(l.g) + '" title="' + attr(l.name + ': ' + ROLE[w[1]] + '. ' + w[2]) + '">' + mark(w[1], l.g) + '<span class="sr-only">' + ROLE[w[1]] + '</span></td>'
+          : '<td data-lane="' + l.id + '"></td>';
+      });
+      h += '</tr>';
+    });
+  });
+  document.getElementById('matrix').innerHTML = h + '</tbody>';
+
+  /* Thẻ chi tiết */
+  var phasesEl = document.getElementById('phases');
+  PHASES.forEach(function (ph) {
+    var sec = document.createElement('div'); sec.className = 'phase';
+    var c = '<div class="phase-h"><span class="L">' + ph.L + '</span><h3>' + ph.name + '</h3></div><div class="cards">';
+    ph.steps.forEach(function (s) {
+      c += '<article class="card' + (s.cond ? ' cond' : '') + '" id="buoc-' + s.n + '" data-lanes="' + s.who.map(function (w) { return w[0]; }).join(' ') + '">' +
+        '<div class="card-h"><span class="num">' + pad(s.n) + '</span><h4>' + s.t + '</h4>' +
+        (s.cond ? '<span class="tag tag-cond">' + s.cond + '</span>' : '') + (s.time ? '<span class="tag tag-time">' + s.time + '</span>' : '') + '</div>' +
+        '<div class="rows">' + s.who.map(function (w) {
+          var l = laneById[w[0]];
+          return '<div class="row" data-lane="' + w[0] + '" style="--gc:' + gcolor(l.g) + '"><span class="who">' + l.name + '</span>' +
+            '<span class="role ' + w[1] + '">' + mark(w[1], l.g) + ROLE[w[1]] + '</span><span class="task">' + w[2] + '</span></div>';
+        }).join('') + '</div>' +
+        (s.branch ? '<div class="branch">' + s.branch.map(function (b) { return '<div class="br" style="--bc:var(' + b.c + ')"><b>' + b.h + '</b>' + b.b + '</div>'; }).join('') + '</div>' : '') +
+        (s.notes ? '<div class="note">' + s.notes.map(function (t) { return '<p>' + t + '</p>'; }).join('') + '</div>' : '') +
+        '<div class="out"><b>Sản phẩm:</b><span>' + s.out + '</span></div></article>';
+    });
+    sec.innerHTML = c + '</div>'; phasesEl.appendChild(sec);
+  });
+
+  /* Lọc theo từng bên */
+  var active = null;
+  function apply() {
+    document.querySelectorAll('.chip').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.lane === active ? 'true' : 'false'); });
+    document.querySelectorAll('col[data-col]').forEach(function (col) { col.classList.toggle('hl', col.dataset.col === active); });
+    document.querySelectorAll('tbody tr[data-step]').forEach(function (tr) {
+      tr.classList.toggle('dim', !!active && !tr.querySelector('td.on[data-lane="' + active + '"]'));
+    });
+    document.querySelectorAll('.card').forEach(function (card) {
+      card.classList.toggle('dim', !!active && card.dataset.lanes.split(' ').indexOf(active) < 0);
+      card.querySelectorAll('.row').forEach(function (r) { r.classList.toggle('me', !!active && r.dataset.lane === active); });
+    });
+    document.getElementById('filter-state').textContent = active ? 'Đang xem: ' + laneById[active].name : 'Đang xem: tất cả các bên';
+    try { active ? localStorage.setItem('lane', active) : localStorage.removeItem('lane'); } catch (e) {}
+  }
+  groupsEl.addEventListener('click', function (e) {
+    var b = e.target.closest('.chip'); if (!b) return;
+    active = active === b.dataset.lane ? null : b.dataset.lane; apply();
+  });
+  document.getElementById('reset').addEventListener('click', function () { active = null; apply(); });
+  document.querySelectorAll('tbody tr[data-step]').forEach(function (tr) {
+    tr.addEventListener('click', function () {
+      var card = document.getElementById('buoc-' + tr.dataset.step);
+      var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      card.classList.add('flash'); setTimeout(function () { card.classList.remove('flash'); }, 1400);
+    });
+  });
+  try { var s = localStorage.getItem('lane'); if (s && laneById[s]) active = s; } catch (e) {}
+  apply();
+})();
+
+</script>
 </body>
 </html>
